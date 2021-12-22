@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\external\glfw-3.1.2\tests\empty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\external\glfw-3.1.2\deps\tinycthread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\external\glfw-3.1.2\deps\tinycthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\external\glfw-3.1.2\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{578C83DC-EFB4-34C4-A55A-1AF455410BCD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D18B4F88-BDD0-3D77-9A78-0BB266FC3547}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

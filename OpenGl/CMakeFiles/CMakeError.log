@@ -1,0 +1,14 @@
+Determining if the include file pthread.h exists failed with the following output:
+Change Dir: D:/HSU/Semester5/ComputerGraphics/OpenGl/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe cmTC_52cf2.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:m && Microsoft (R)-Build-Engine, Version 16.9.0+57a23d249 fr .NET Framework
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+  Microsoft (R) C/C++-Optimierungscompiler Version 19.28.29913 fr x64
+  Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+  CheckIncludeFile.c
+  cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_52cf2.dir\Debug\\" /Fd"cmTC_52cf2.dir\Debug\vc142.pdb" /Gd /TC /errorReport:queue D:\HSU\Semester5\ComputerGraphics\OpenGl\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+D:\HSU\Semester5\ComputerGraphics\OpenGl\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1,10): fatal error C1083: Datei (Include) kann nicht ge”ffnet werden: "pthread.h": No such file or directory [D:\HSU\Semester5\ComputerGraphics\OpenGl\CMakeFiles\CMakeTmp\cmTC_52cf2.vcxproj]
+
+
+
