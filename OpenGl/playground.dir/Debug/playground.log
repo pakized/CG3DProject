@@ -1,4 +1,4 @@
 ﻿  playground.cpp
-D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\playground\playground.cpp(79,61): warning C4305: '+=': truncation from 'double' to 'float'
-D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\playground\playground.cpp(197,58): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
+D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\playground\playground.cpp(107,61): warning C4305: '+=': truncation from 'double' to 'float'
+D:\HSU\Semester5\ComputerGraphics\OpenGl\OpenGL-Template-master\playground\playground.cpp(237,58): warning C4267: '=': conversion from 'size_t' to 'GLuint', possible loss of data
   playground.vcxproj -> D:\HSU\Semester5\ComputerGraphics\OpenGl\Debug\playground.exe
