@@ -6,6 +6,11 @@
 
 2. Change update mvp to make one model move
 
+2.5. Add another model (for some reason this one looks better even tough its the same model)
+      
+     - second shark on the right 
+     - moves faster
+
 3. change vertex shader and fragment shader to change the color of the objects
 		
 		use A vertex shader and pass the color to it as a uniform variable:
@@ -29,7 +34,7 @@
 		then it should be possible to change the color of the objects
 
 
-
+4. maybe add another model moving with z axis too to make it look cooler
 
 #include "playground.h"
 
@@ -67,6 +72,9 @@ int main( void )
   //neuer code: ( project does not work with this)
   bool vertexbufferForObjectAInitialized = initializeVertexbufferForObjectA();
   if (!vertexbufferForObjectAInitialized) return -1;
+
+  bool vertexbufferForObjectBInitialized = initializeVertexbufferForObjectB();
+  if (!vertexbufferForObjectBInitialized) return -1;
 
  /* bool vertexbufferForObjectB = initializeVertexbuffer();
   if (!vertexbufferForObjectB) return -1;
@@ -109,17 +117,17 @@ int main( void )
   curr_angle = 0;
 
   //neuer code:
-  //position second object
-  xA = -0.5f;
+  //position second object Done
+  xA = 25.5f;
   yA = 0.0f;
   zA = 0.0f;
 
-  //position third object
-  xB = -0.5f;
-  yB = 0.0f;
+  //position third object Done
+  xB = -135.5f;
+  yB = 25.0f;
   zB = 0.0f;
 
-  //position fourth object
+  //position fourth object  TODO
   xC = -0.5f;
   yC = 0.0f;
   zC = 0.0f;
@@ -157,10 +165,10 @@ void updateAnimationLoop()
   glUseProgram(programID);
 
   // Update the variables for movement / rotation if a key was pressed
-  if (glfwGetKey(window, GLFW_KEY_W)) curr_y+=1.0;
-  else if (glfwGetKey(window, GLFW_KEY_S)) curr_y-=1.0;
-  else if (glfwGetKey(window, GLFW_KEY_A)) curr_x-=1.0;
-  else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=1.0;
+  if (glfwGetKey(window, GLFW_KEY_W)) curr_y+=2.0;
+  else if (glfwGetKey(window, GLFW_KEY_S)) curr_y-=2.0;
+  else if (glfwGetKey(window, GLFW_KEY_A)) curr_x-=2.0;
+  else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=2.0;
   else if (glfwGetKey(window, GLFW_KEY_R)) curr_angle += 0.1;
 
   //for the other models it would be:
@@ -168,12 +176,19 @@ void updateAnimationLoop()
         y = y-1  (only from above to bottom then)
         if y = end window 
             delete model add new model with the same start points 
+            or change change ý value of the model = same effect
   */
 
   yA = yA - 1;
-  if (yA == -300) 
+  if (yA <= -300) 
   {
       yA = 0;
+  }
+
+  yB = yB - 1.7;
+  if (yB <= -350)
+  {
+      yB = 0;
   }
 
   // Update the MVP transformation with the new values
@@ -210,7 +225,9 @@ void updateAnimationLoop()
 
   // Draw the triangle ! fishA
   glDrawArrays(GL_TRIANGLES, 0, vertexbuffer_size); // 3 indices starting at 0 -> 1 triangle
-  updateMVPTransformation(xA, yA, 0.0);
+  updateMVPTransformation(xA, yA, 0);
+
+  //  updateMVPTransformation(xA + 1, yA +1 , 0 + 1);
 
 
   //new code (copy down the code from above for our next vertex buffer):
@@ -249,6 +266,44 @@ void updateAnimationLoop()
   );
   // Draw the triangle ! //fish
   glDrawArrays(GL_TRIANGLES, 0, vertexbufferForObjectA_size); // 3 indices starting at 0 -> 1 triangle
+  updateMVPTransformation(xB, yB, 0);
+
+  //new code (copy down the code from above for our next vertex buffer):
+  // 
+    // Send our transformation to the currently bound shader, 
+  // in the "MVP" uniform and also the "MV" uniform
+  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+  glUniformMatrix4fv(MatrixIDMV, 1, GL_FALSE, &MV[0][0]);
+
+  // 1rst attribute buffer : vertices
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectB[0]);
+
+  //bind buffer (array buffer) to buffer binding point (vertexbuffer)
+  //bind name (2.parameter) to target(1.parameter)
+
+  glVertexAttribPointer(
+      0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+  );
+
+  // 2nd attribute buffer : normals
+  glEnableVertexAttribArray(1);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectB[1]);
+  glVertexAttribPointer(
+      1,                  // attribute 1. No particular reason for 1, but must match the layout in the shader.
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+  );
+  // Draw the triangle ! //fish
+  glDrawArrays(GL_TRIANGLES, 0, vertexbufferForObjectB_size); // 3 indices starting at 0 -> 1 triangle
 
   //maybee copy this 2 more times 
   //end code
@@ -338,7 +393,7 @@ bool initializeVertexbuffer()
   //std::vector< glm::vec3 > vertices2 = std::vector< glm::vec3 >();
   //std::vector< glm::vec3 > normals2 = std::vector< glm::vec3 >();
 
-  loadSTLFile(vertices, normals, "C:/temp/bunny-decimated.stl");
+  loadSTLFile(vertices, normals, "C:/temp/bunny-decimated.stl", 0, 0);
   //loadSTLFile(vertices2, normals2, "C:/temp/Shark.stl");
   vertexbuffer_size = vertices.size() * sizeof(glm::vec3);
   
@@ -389,7 +444,7 @@ bool initializeVertexbufferForObjectA()
     vertices.push_back(vec3(xA,yA,0.0));
     normals.push_back(triangleNormal);
 
-    loadSTLFile(vertices, normals, "C:/temp/Shark.stl");
+    loadSTLFile(vertices, normals, "C:/temp/Shark.stl", xA, yA);
     vertexbufferForObjectA_size = vertices.size() * sizeof(glm::vec3);
 
     glGenBuffers(2, vertexbufferForObjectA); //generate two buffers, one for the vertices, one for the normals
@@ -411,11 +466,47 @@ bool initializeVertexbufferForObjectA()
     return true;
 }
 
+
+//we have to initilaize our other0 Vbuffer
+bool initializeVertexbufferForObjectB()
+{
+
+    glGenVertexArrays(1, &VertexArrayForObjectBID);
+    glBindVertexArray(VertexArrayForObjectBID);
+
+    std::vector< glm::vec3 > vertices = std::vector< glm::vec3 >();
+    std::vector< glm::vec3 > normals = std::vector< glm::vec3 >();
+
+
+    loadSTLFile(vertices, normals, "C:/temp/Shark.stl", -100, 0);
+    vertexbufferForObjectB_size = vertices.size() * sizeof(glm::vec3);
+
+    glGenBuffers(2, vertexbufferForObjectB); //generate two buffers, one for the vertices, one for the normals
+
+    //glGenBuffers(n, buffers) n = number of buffers, buffers = array in which buffer object names are stored 
+
+    //fill first buffer (vertices)
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectB[0]);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    //fill second buffer (normals)
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectB[1]);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    return true;
+}
+
+
 bool cleanupVertexbuffer()
 {
   // Cleanup VBO
   glDeleteVertexArrays(1, &VertexArrayID);
   glDeleteVertexArrays(1, &VertexArrayForObjectAID);
+  glDeleteVertexArrays(1, &VertexArrayForObjectBID);
   return true;
 }
 
@@ -427,7 +518,9 @@ bool closeWindow()
 
 void loadSTLFile(std::vector< glm::vec3 >& vertices, 
                  std::vector< glm::vec3 >& normals, 
-                 std::string stl_file_name)
+                 std::string stl_file_name,
+                 float startPointX,
+                 float startPointY)
 {
   stl::stl_data info = stl::parse_stl(stl_file_name);
   std::vector<stl::triangle> triangles = info.triangles;
@@ -437,13 +530,13 @@ void loadSTLFile(std::vector< glm::vec3 >& vertices,
                                          t.normal.y, 
                                          t.normal.z);
     //add vertex and normal for point 1:
-    vertices.push_back(glm::vec3(t.v1.x, t.v1.y, t.v1.z));
+    vertices.push_back(glm::vec3(t.v1.x + startPointX, t.v1.y + startPointY, t.v1.z));
     normals.push_back(triangleNormal);
     //add vertex and normal for point 2:
-    vertices.push_back(glm::vec3(t.v2.x, t.v2.y, t.v2.z));
+    vertices.push_back(glm::vec3(t.v2.x + startPointX, t.v2.y + startPointY, t.v2.z));
     normals.push_back(triangleNormal);
     //add vertex and normal for point 3:
-    vertices.push_back(glm::vec3(t.v3.x, t.v3.y, t.v3.z));
+    vertices.push_back(glm::vec3(t.v3.x + startPointX, t.v3.y + startPointY, t.v3.z));
     normals.push_back(triangleNormal);
   }
 }
