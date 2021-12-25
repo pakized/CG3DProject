@@ -32,7 +32,11 @@
 		}
 		
 		then it should be possible to change the color of the objects
+		
+		I used the answer from here thouh
+		https://stackoverflow.com/questions/3226578/passing-a-variable-to-an-opengl-glsl-shader
 
+    - it changes color in different situations
 
 4. maybe add another model moving with z axis too to make it look cooler
 
@@ -41,6 +45,9 @@
 // Include GLFW
 #include <glfw3.h>
 GLFWwindow* window;
+
+//https://stackoverflow.com/questions/50975196/is-it-possible-to-change-the-color-of-an-object-with-a-variable-in-opengl
+//change color
 
 // Include standard headers
 #include <stdio.h>
@@ -72,6 +79,17 @@ int main( void )
   //neuer code: ( project does not work with this)
   bool vertexbufferForObjectAInitialized = initializeVertexbufferForObjectA();
   if (!vertexbufferForObjectAInitialized) return -1;
+
+
+  //color
+  rS = 0.0;
+  gS = 1.0;
+  bS = 1.0;
+
+  rB = 1.0;
+      gB = 0.0;
+      bB = 1.0;
+
 
   bool vertexbufferForObjectBInitialized = initializeVertexbufferForObjectB();
   if (!vertexbufferForObjectBInitialized) return -1;
@@ -156,6 +174,8 @@ int main( void )
 	return 0;
 }
 
+
+
 void updateAnimationLoop()
 {
   // Clear the screen
@@ -164,12 +184,41 @@ void updateAnimationLoop()
   // Use our shader
   glUseProgram(programID);
 
+ 
+  GLint myUniformLocation = glGetUniformLocation(programID, "rgbColor");
+  glUniform3f(myUniformLocation, rB, gB, bB)/* some floating point value here */;
+
+
   // Update the variables for movement / rotation if a key was pressed
   if (glfwGetKey(window, GLFW_KEY_W)) curr_y+=2.0;
   else if (glfwGetKey(window, GLFW_KEY_S)) curr_y-=2.0;
   else if (glfwGetKey(window, GLFW_KEY_A)) curr_x-=2.0;
   else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=2.0;
   else if (glfwGetKey(window, GLFW_KEY_R)) curr_angle += 0.1;
+
+  bool dangerZone = false;
+
+  if (curr_x <= xB + 50 || curr_x >= xA + 75)             //-135.5f; = xA add number for bunny head when its in the danger zone get red
+  {
+      rB = 1.0;
+      gB = 0.0;
+      bB = 0.0;
+      dangerZone = true;
+  }
+  if (curr_x > xB + 50 && curr_x < xA + 75)             //change color back to normal when bunny is out of danger zone
+  {
+      rB = 1.0;
+      gB = 0.0;
+      bB = 1.0;
+      dangerZone = false;
+  }
+  if (curr_y > 99 && dangerZone == false)               //change color when bunny is at a save spot
+  {
+      rB = 0.0;
+      gB = 1.0;
+      bB = 0.7;
+  }
+
 
   //for the other models it would be:
   /*
@@ -226,6 +275,7 @@ void updateAnimationLoop()
   // Draw the triangle ! fishA
   glDrawArrays(GL_TRIANGLES, 0, vertexbuffer_size); // 3 indices starting at 0 -> 1 triangle
   updateMVPTransformation(xA, yA, 0);
+  glUniform3f(myUniformLocation, rS, gS, bS)/* some floating point value here */;
 
   //  updateMVPTransformation(xA + 1, yA +1 , 0 + 1);
 
@@ -264,6 +314,12 @@ void updateAnimationLoop()
       0,                  // stride
       (void*)0            // array buffer offset
   );
+
+  //color?
+  // 
+  // 
+
+
   // Draw the triangle ! //fish
   glDrawArrays(GL_TRIANGLES, 0, vertexbufferForObjectA_size); // 3 indices starting at 0 -> 1 triangle
   updateMVPTransformation(xB, yB, 0);
@@ -540,9 +596,3 @@ void loadSTLFile(std::vector< glm::vec3 >& vertices,
     normals.push_back(triangleNormal);
   }
 }
-
-	
-	
-	
-	
-	
