@@ -40,6 +40,10 @@
 
 4. maybe add another model moving with z axis too to make it look cooler
 
+      - add seastar rotates 
+      - change color randomly
+      - bunny get red when in "star-zone"
+
 #include "playground.h"
 
 // Include GLFW
@@ -87,12 +91,19 @@ int main( void )
   bS = 1.0;
 
   rB = 1.0;
-      gB = 0.0;
-      bB = 1.0;
+  gB = 0.0;
+  bB = 1.0;
+
+  rSt = 0.0;
+  gSt = 0.0;
+  bSt = 0.0;
 
 
   bool vertexbufferForObjectBInitialized = initializeVertexbufferForObjectB();
   if (!vertexbufferForObjectBInitialized) return -1;
+
+  bool vertexbufferForObjectCInitialized = initializeVertexbufferForObjectC();
+  if (!vertexbufferForObjectCInitialized) return -1;
 
  /* bool vertexbufferForObjectB = initializeVertexbuffer();
   if (!vertexbufferForObjectB) return -1;
@@ -133,6 +144,7 @@ int main( void )
   curr_x = 0;
   curr_y = 0;
   curr_angle = 0;
+  int timer = 0;
 
   //neuer code:
   //position second object Done
@@ -146,7 +158,7 @@ int main( void )
   zB = 0.0f;
 
   //position fourth object  TODO
-  xC = -0.5f;
+  xC = -0.0f;
   yC = 0.0f;
   zC = 0.0f;
   //bis hier
@@ -194,18 +206,18 @@ void updateAnimationLoop()
   else if (glfwGetKey(window, GLFW_KEY_S)) curr_y-=2.0;
   else if (glfwGetKey(window, GLFW_KEY_A)) curr_x-=2.0;
   else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=2.0;
-  else if (glfwGetKey(window, GLFW_KEY_R)) curr_angle += 0.1;
+  //else if (glfwGetKey(window, GLFW_KEY_R)) curr_angle += 0.5;
 
   bool dangerZone = false;
 
-  if (curr_x <= xB + 50 || curr_x >= xA + 75)             //-135.5f; = xA add number for bunny head when its in the danger zone get red
+  if (curr_x <= xB + 50 || curr_x >= xA + 75 || curr_y < 0)             //-135.5f; = xA add number for bunny head when its in the danger zone get red
   {
       rB = 1.0;
       gB = 0.0;
       bB = 0.0;
       dangerZone = true;
   }
-  if (curr_x > xB + 50 && curr_x < xA + 75)             //change color back to normal when bunny is out of danger zone
+  if (curr_x > xB + 50 && curr_x < xA + 75 && curr_y > 0)             //change color back to normal when bunny is out of danger zone
   {
       rB = 1.0;
       gB = 0.0;
@@ -219,6 +231,26 @@ void updateAnimationLoop()
       bB = 0.7;
   }
 
+  timer++;
+  if (timer >= 5) {
+  //change color:
+  rSt = rSt + 0.1;
+  if (rSt >= 1) 
+  {
+      rSt = 0.5;
+  }
+  gSt = gSt + 0.2;
+  if (gSt >= 1)
+  {
+      gSt = 0.5;
+  }  
+  bSt = bSt + 0.3;
+  if (bSt >= 1)
+  {
+      bSt = 0.5;
+  }
+  timer = 0;
+  }
 
   //for the other models it would be:
   /*
@@ -240,8 +272,10 @@ void updateAnimationLoop()
       yB = 0;
   }
 
+  curr_angle += 0.05;
+
   // Update the MVP transformation with the new values
-  updateMVPTransformation(curr_x, curr_y, curr_angle);
+  updateMVPTransformation(curr_x, curr_y, 0.0);
 
   // Send our transformation to the currently bound shader, 
   // in the "MVP" uniform and also the "MV" uniform
@@ -361,6 +395,51 @@ void updateAnimationLoop()
   // Draw the triangle ! //fish
   glDrawArrays(GL_TRIANGLES, 0, vertexbufferForObjectB_size); // 3 indices starting at 0 -> 1 triangle
 
+
+
+  updateMVPTransformation(xC, yC, curr_angle);
+  glUniform3f(myUniformLocation, rSt, gSt, bSt)/* some floating point value here */;
+
+  //new code (copy down the code from above for our next vertex buffer):
+  // 
+    // Send our transformation to the currently bound shader, 
+  // in the "MVP" uniform and also the "MV" uniform
+  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+  glUniformMatrix4fv(MatrixIDMV, 1, GL_FALSE, &MV[0][0]);
+
+  // 1rst attribute buffer : vertices
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectC[0]);
+
+  //bind buffer (array buffer) to buffer binding point (vertexbuffer)
+  //bind name (2.parameter) to target(1.parameter)
+
+  glVertexAttribPointer(
+      0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+  );
+
+  // 2nd attribute buffer : normals
+  glEnableVertexAttribArray(1);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectC[1]);
+  glVertexAttribPointer(
+      1,                  // attribute 1. No particular reason for 1, but must match the layout in the shader.
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+  );
+  // Draw the triangle ! //fish
+  glDrawArrays(GL_TRIANGLES, 0, vertexbufferForObjectC_size); // 3 indices starting at 0 -> 1 triangle
+
+
+
+
   //maybee copy this 2 more times 
   //end code
 
@@ -427,7 +506,8 @@ bool updateMVPTransformation(float posX, float posY, float angle)
 
   // Model matrix, example with 3 parameters (curr_angle, curr_x, curr_y)
   glm::mat4 Model = glm::mat4(1.0f); //start with identity matrix
-  Model = glm::rotate(Model, angle, glm::vec3(1.0f, 0.0f, 0.0f)); //apply orientation (last parameter: axis)
+  //change rotation:
+  Model = glm::rotate(Model, angle, glm::vec3(-0.0f, -1.0f, -0.50f)); //apply orientation (last parameter: axis)
   Model = glm::translate(Model,glm::vec3(posX, posY, 0.0f)); //apply translation
   
   // Our ModelViewProjection : multiplication of our 3 matrices
@@ -555,6 +635,41 @@ bool initializeVertexbufferForObjectB()
 
     return true;
 }
+
+
+bool initializeVertexbufferForObjectC()
+{
+
+    glGenVertexArrays(1, &VertexArrayForObjectCID);
+    glBindVertexArray(VertexArrayForObjectCID);
+
+    std::vector< glm::vec3 > vertices = std::vector< glm::vec3 >();
+    std::vector< glm::vec3 > normals = std::vector< glm::vec3 >();
+
+
+    loadSTLFile(vertices, normals, "C:/temp/star.stl", 0, -100);
+    vertexbufferForObjectC_size = vertices.size() * sizeof(glm::vec3);
+
+    glGenBuffers(2, vertexbufferForObjectC); //generate two buffers, one for the vertices, one for the normals
+
+    //glGenBuffers(n, buffers) n = number of buffers, buffers = array in which buffer object names are stored 
+
+    //fill first buffer (vertices)
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectC[0]);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    //fill second buffer (normals)
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbufferForObjectC[1]);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    return true;
+}
+
+
 
 
 bool cleanupVertexbuffer()
